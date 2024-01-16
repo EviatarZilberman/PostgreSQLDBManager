@@ -8,7 +8,7 @@ namespace PostgreSQLDBManager
 {
     public interface ISql<T>
     {
-        public void Select();
+        public Task<T> Select(string search, string param);
 /*        public string SelectString(string parameter, string search, string where);
         public T SelectById(Guid id);*/
     }

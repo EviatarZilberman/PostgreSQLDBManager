@@ -14,7 +14,7 @@ namespace PostgreSQLDBManager
 {
     public class DBManager
     {
-        public static NpgsqlConnection? ConnectionString { get; set; } = null;
+        public static NpgsqlConnection ConnectionString { get; set; } = null;
         private static DBManager? instance = null;
 
         private DBManager() { }
@@ -39,8 +39,8 @@ namespace PostgreSQLDBManager
             query = Colboinik.ValidateQuery(query, true);
             try
             {
-                await ConnectionString.CloseAsync(); // Opens the connectionstring.
-                await ConnectionString.OpenAsync();
+                await ConnectionString.CloseAsync();
+                await ConnectionString.OpenAsync(); // Opens the connectionstring.
                 NpgsqlCommand cmd = new NpgsqlCommand(query, ConnectionString);
                 int n = cmd.ExecuteNonQuery();
                 if (n == 1)
@@ -81,7 +81,7 @@ namespace PostgreSQLDBManager
 
         public static async Task<CoreReturns> TestConnection()
         {
-            await using (NpgsqlConnection con = ConnectionString)
+            await using (NpgsqlConnection? con = ConnectionString)
             {
 
                 await con.OpenAsync();
@@ -94,31 +94,10 @@ namespace PostgreSQLDBManager
             return CoreReturns.ERROR;
         }
 
-        public static string CreateConnectionString() 
+        public static string CreateConnectionString()
         {
             ConfigurationsKeeper ConfigKeeper = new ConfigurationsKeeper();
             return $@"User ID=postgres;Password=Popmart123!;Server={ConfigKeeper.Data["server"]};Port={ConfigKeeper.Data["dbport"]};Database={ConfigKeeper.Data["database"]};Include Error Detail=true;";
         }
-
-
-
-    
-
-/*    class Program
-    {
-        static void Main()
-        {
-            string connectionString = "Your PostgreSQL Connection String";
-            PostgresHelper postgresHelper = new PostgresHelper(connectionString);
-
-            List<string> results = postgresHelper.SelectData();
-
-            foreach (string result in results)
-            {
-                Console.WriteLine(result);
-            }
-        }
-    }*/
-
-}
+    }
 }
