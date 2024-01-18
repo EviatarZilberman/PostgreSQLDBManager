@@ -7,13 +7,16 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Utilities;
+using Utilities.Interfaces;
+using Utilities.Models;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace PostgreSQLDBManager
 {
     public class DBManager
     {
+        private static IColboinik _Colboinik { get; set; } = new Colboinik();
+        //public static NpgsqlConnection ConnectionString { get; set; } = new NpgsqlConnection(CreateConnectionString());
         public static NpgsqlConnection ConnectionString { get; set; } = null;
         private static DBManager? instance = null;
 
@@ -36,7 +39,7 @@ namespace PostgreSQLDBManager
         private async static Task<CoreReturns> ExecuteQuery(string? query, string queryName)
         {
             if (StringValidation(query) != CoreReturns.SUCCESS) return CoreReturns.IS_NULL_OR_EMPTY;
-            query = Colboinik.ValidateQuery(query, true);
+            query = _Colboinik.ValidateQuery(query, true);
             try
             {
                 await ConnectionString.CloseAsync();
@@ -94,7 +97,7 @@ namespace PostgreSQLDBManager
             return CoreReturns.ERROR;
         }
 
-        public static string CreateConnectionString()
+        private static string CreateConnectionString()
         {
             ConfigurationsKeeper ConfigKeeper = new ConfigurationsKeeper();
             return $@"User ID=postgres;Password=Popmart123!;Server={ConfigKeeper.Data["server"]};Port={ConfigKeeper.Data["dbport"]};Database={ConfigKeeper.Data["database"]};Include Error Detail=true;";
