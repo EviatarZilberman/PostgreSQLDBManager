@@ -1,15 +1,8 @@
 ﻿using ConfigApp;
 using Npgsql;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Utilities.Interfaces;
 using Utilities.Models;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace PostgreSQLDBManager
 {
@@ -17,7 +10,7 @@ namespace PostgreSQLDBManager
     {
         private static IColboinik _Colboinik { get; set; } = new Colboinik();
         //public static NpgsqlConnection ConnectionString { get; set; } = new NpgsqlConnection(CreateConnectionString());
-        public static NpgsqlConnection ConnectionString { get; set; } = null;
+        public static NpgsqlConnection? ConnectionString { get; set; } = null;
         private static DBManager? instance = null;
 
         private DBManager() { }
