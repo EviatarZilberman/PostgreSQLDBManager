@@ -1,8 +1,11 @@
 ﻿using ConfigApp;
 using Npgsql;
 using System.Data;
-using Utilities.Interfaces;
-using Utilities.Models;
+using UtilitiesAndHelpers.Interfaces;
+using UtilitiesAndHelpers.Models;
+using UtilitiesAndHelpers.Enums;
+using UtilitiesAndHelpers.Classes;
+
 
 namespace PostgreSQLDBManager
 {

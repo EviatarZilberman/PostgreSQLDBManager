@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ConfigApp\ConfigApp.csproj" />
-    <ProjectReference Include="..\Utilities\Utilities.csproj" />
+    <ProjectReference Include="..\DataSharingApp\UtilitiesAndHelpers\UtilitiesAndHelpers.csproj" />
   </ItemGroup>
 
 </Project>
