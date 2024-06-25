@@ -41,7 +41,7 @@ namespace PostgreSQLDBManager
                 await ConnectionString.CloseAsync();
                 await ConnectionString.OpenAsync(); // Opens the connectionstring.
                 NpgsqlCommand cmd = new NpgsqlCommand(query, ConnectionString);
-                int n = cmd.ExecuteNonQuery();
+                int n = await cmd.ExecuteNonQueryAsync();
                 if (n == 1)
                 {
                     await ConnectionString.CloseAsync(); // Varify that the connectionstring is closed.
