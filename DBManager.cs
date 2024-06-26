@@ -9,19 +9,19 @@ using UtilitiesAndHelpers.Classes;
 
 namespace PostgreSQLDBManager
 {
-    public class DBManager
+    public class DBManager<T>
     {
         private static IColboinik _Colboinik { get; set; } = new Colboinik();
         //public static NpgsqlConnection ConnectionString { get; set; } = new NpgsqlConnection(CreateConnectionString());
         public static NpgsqlConnection? ConnectionString { get; set; } = null;
-        private static DBManager? instance = null;
+        private static DBManager<T>? instance = null;
 
         private DBManager() { }
-        public static DBManager Instance()
+        public static DBManager<T> Instance()
         {
             if (instance == null)
             {
-                instance = new DBManager();
+                instance = new DBManager<T>();
                 ConnectionString = new NpgsqlConnection(CreateConnectionString());
             }
             return instance;
@@ -58,6 +58,34 @@ namespace PostgreSQLDBManager
             return CoreReturns.ERROR;
         }
 
+        private async static Task<T?> ExecuteSelectQuery<T>(string? query) where T : ISql<T>, new()
+        {
+            if (StringValidation(query) != CoreReturns.SUCCESS) return default;
+            query = _Colboinik.ValidateQuery(query, true);
+            try
+            {
+                await ConnectionString.CloseAsync();
+                await ConnectionString.OpenAsync(); // Opens the connectionstring.
+                NpgsqlCommand cmd = new NpgsqlCommand(query, ConnectionString);
+
+                using var reader = await cmd.ExecuteReaderAsync();
+                if (await reader.ReadAsync())
+                {
+                    T result = new T();
+                    T mappedResult = result.CreateInstanceFromMap(reader);
+                    await ConnectionString.CloseAsync();
+                    return mappedResult;
+                }
+            }
+            catch (Exception ex)
+            {
+                await ConnectionString.CloseAsync(); // Verify that the connectionstring is closed.
+                LogWriter.Instance().WriteLog(System.Reflection.MethodBase.GetCurrentMethod().Name, $"Error in Select: {ex.Message}, query: {query}");
+            }
+            return default;
+        }
+
+
         public async Task<CoreReturns> Insert(string? query)
         {
             return await ExecuteQuery(query, "Insert");
@@ -73,9 +101,9 @@ namespace PostgreSQLDBManager
             return await ExecuteQuery(query, "Update");
         }
 
-        public async Task<CoreReturns> Create(string query)
+        public async Task<T?> Select<T>(string query) where T : ISql<T>, new()
         {
-            return await ExecuteQuery(query, "Create");
+            return await ExecuteSelectQuery<T>(query);
         }
 
         public static async Task<CoreReturns> TestConnection()
