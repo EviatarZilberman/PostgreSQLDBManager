@@ -35,7 +35,7 @@ namespace PostgreSQLDBManager
         private async static Task<CoreReturns> ExecuteQuery(string? query, string queryName)
         {
             if (StringValidation(query) != CoreReturns.SUCCESS) return CoreReturns.IS_NULL_OR_EMPTY;
-            query = _Colboinik.ValidateQuery(query, true);
+            //query = _Colboinik.ValidateQuery(query, true);
             try
             {
                 await ConnectionString.CloseAsync();
@@ -52,7 +52,7 @@ namespace PostgreSQLDBManager
             catch (Exception ex)
             {
                 await ConnectionString.CloseAsync(); // Varify that the connectionstring is closed.
-                LogWriter.Instance().WriteLog(System.Reflection.MethodBase.GetCurrentMethod().Name, $"Error in {queryName}: {ex.Message}, query: {query}");
+                //LogWriter.Instance().WriteLog(System.Reflection.MethodBase.GetCurrentMethod().Name, $"Error in {queryName}: {ex.Message}, query: {query}");
                 return CoreReturns.ANOTHER_ERROR_SEE_LOGS;
             }
             return CoreReturns.ERROR;
