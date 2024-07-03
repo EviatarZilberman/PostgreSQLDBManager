@@ -4,14 +4,14 @@ using System.Data;
 using UtilitiesAndHelpers.Interfaces;
 using UtilitiesAndHelpers.Models;
 using UtilitiesAndHelpers.Enums;
-using UtilitiesAndHelpers.Classes;
+using System.Reflection;
 
 
 namespace PostgreSQLDBManager
 {
     public class DBManager<T>
     {
-        private static IColboinik _Colboinik { get; set; } = new Colboinik();
+        private static IColboinik _Colboinik { get; set; } = new UtilitiesAndHelpers.Classes.Colboinik();
         //public static NpgsqlConnection ConnectionString { get; set; } = new NpgsqlConnection(CreateConnectionString());
         public static NpgsqlConnection? ConnectionString { get; set; } = null;
         private static DBManager<T>? instance = null;
@@ -32,7 +32,7 @@ namespace PostgreSQLDBManager
             return string.IsNullOrEmpty(s) || string.IsNullOrWhiteSpace(s) ? CoreReturns.IS_NULL_OR_EMPTY : CoreReturns.SUCCESS;
         }
 
-        private async static Task<CoreReturns> ExecuteQuery(string? query, string queryName)
+        private async static Task<CoreReturns> ExecuteQuery(string? query, string? queryName)
         {
             if (StringValidation(query) != CoreReturns.SUCCESS) return CoreReturns.IS_NULL_OR_EMPTY;
             //query = _Colboinik.ValidateQuery(query, true);
@@ -40,7 +40,7 @@ namespace PostgreSQLDBManager
             {
                 await ConnectionString.CloseAsync();
                 await ConnectionString.OpenAsync(); // Opens the connectionstring.
-                NpgsqlCommand cmd = new NpgsqlCommand(query, ConnectionString);
+                NpgsqlCommand cmd = new (query, ConnectionString);
                 int n = await cmd.ExecuteNonQueryAsync();
                 if (n == 1)
                 {
@@ -66,12 +66,12 @@ namespace PostgreSQLDBManager
             {
                 await ConnectionString.CloseAsync();
                 await ConnectionString.OpenAsync(); // Opens the connectionstring.
-                NpgsqlCommand cmd = new NpgsqlCommand(query, ConnectionString);
+                NpgsqlCommand cmd = new (query, ConnectionString);
 
                 using var reader = await cmd.ExecuteReaderAsync();
                 if (await reader.ReadAsync())
                 {
-                    T result = new T();
+                    T result = new();
                     T mappedResult = result.CreateInstanceFromMap(reader);
                     await ConnectionString.CloseAsync();
                     return mappedResult;
@@ -80,7 +80,7 @@ namespace PostgreSQLDBManager
             catch (Exception ex)
             {
                 await ConnectionString.CloseAsync(); // Verify that the connectionstring is closed.
-                LogWriter.Instance().WriteLog(System.Reflection.MethodBase.GetCurrentMethod().Name, $"Error in Select: {ex.Message}, query: {query}");
+                LogWriter.Instance().WriteLog(MethodBase.GetCurrentMethod()?.Name, $"Error in SelectFactory: {ex.Message}, query: {query}");
             }
             return default;
         }
@@ -93,15 +93,15 @@ namespace PostgreSQLDBManager
 
         public async Task<CoreReturns> Delete(string query)
         {
-            return await ExecuteQuery(query, "Delete");
+            return await ExecuteQuery(query, "DeleteFactory");
         }
 
         public async Task<CoreReturns> Update(string query)
         {
-            return await ExecuteQuery(query, "Update");
+            return await ExecuteQuery(query, "UpdateFactory");
         }
 
-        public async Task<T?> Select<T>(string query) where T : ISql<T>, new()
+        public async Task<T?> Select<T>(string? query) where T : ISql<T>, new()
         {
             return await ExecuteSelectQuery<T>(query);
         }
@@ -123,7 +123,7 @@ namespace PostgreSQLDBManager
 
         private static string CreateConnectionString()
         {
-            ConfigurationsKeeper ConfigKeeper = new ConfigurationsKeeper();
+            ConfigurationsKeeper ConfigKeeper = new();
             return $@"User ID=postgres;Password=Popmart123!;Server={ConfigKeeper.Data["server"]};Port={ConfigKeeper.Data["dbport"]};Database={ConfigKeeper.Data["database"]};Include Error Detail=true;";
         }
     }
