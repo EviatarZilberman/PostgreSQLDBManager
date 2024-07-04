@@ -58,7 +58,7 @@ namespace PostgreSQLDBManager
             return CoreReturns.ERROR;
         }
 
-        private async static Task<T?> ExecuteSelectQuery<T>(string? query) where T : ISql<T>, new()
+        private async static Task<T?> ExecuteSelectQuery<T>(string? query) where T : class,  ISql<T>, new()
         {
             if (StringValidation(query) != CoreReturns.SUCCESS) return default;
             query = _Colboinik.ValidateQuery(query, true);
@@ -101,7 +101,7 @@ namespace PostgreSQLDBManager
             return await ExecuteQuery(query, "UpdateFactory");
         }
 
-        public async Task<T?> Select<T>(string? query) where T : ISql<T>, new()
+        public async Task<T?> Select<T>(string? query) where T : class, ISql<T>, new()
         {
             return await ExecuteSelectQuery<T>(query);
         }
