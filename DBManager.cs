@@ -61,7 +61,7 @@ namespace PostgreSQLDBManager
         private async static Task<T?> ExecuteSelectQuery<T>(string? query) where T : class,  ISql<T>, new()
         {
             if (StringValidation(query) != CoreReturns.SUCCESS) return default;
-            query = _Colboinik.ValidateQuery(query, true);
+            //query = _Colboinik.ValidateQuery(query, true);
             try
             {
                 await ConnectionString.CloseAsync();
